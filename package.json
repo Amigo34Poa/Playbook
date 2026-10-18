@@ -1,0 +1,85 @@
+{
+  "name": "playbook-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Crie processos comerciais a partir da sua voz e de capturas de tela.",
+  "author": "Playbook Studio",
+  "type": "module",
+  "main": "dist-electron/electron/main.js",
+  "scripts": {
+    "dev": "npm run build:electron && concurrently -k \"vite --host 127.0.0.1\" \"tsc -p tsconfig.electron.json --watch\" \"wait-on http-get://127.0.0.1:5173 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "build": "tsc --noEmit && vite build && npm run build:electron",
+    "test": "tsx --test tests/*.test.ts",
+    "dist:win": "npm run build && electron-builder --win nsis --x64",
+    "start": "electron .",
+    "test:ui": "playwright test",
+    "test:desktop": "node tests/desktop.mjs",
+    "dist:portable": "npm run build && electron-builder --win portable --x64"
+  },
+  "dependencies": {
+    "docx": "^9.5.1",
+    "fflate": "^0.8.3",
+    "lucide-react": "^0.468.0",
+    "pdf-parse": "1.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "saxes": "^6.0.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.0.0",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.0",
+    "cross-env": "^7.0.3",
+    "electron": "^44.9.0",
+    "electron-builder": "^26.0.12",
+    "mammoth": "^1.13.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^6.3.0",
+    "wait-on": "^8.0.0"
+  },
+  "build": {
+    "appId": "br.com.playbook.studio",
+    "productName": "Playbook Studio",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "artifactName": "Playbook-Studio-${version}-Windows-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "extraResources": [
+      {
+        "from": "scripts/Preparar-IA.ps1",
+        "to": "Preparar-IA.ps1"
+      },
+      {
+        "from": "README.md",
+        "to": "LEIA-ME.md"
+      }
+    ]
+  },
+  "engines": {
+    "node": ">=24 <25"
+  }
+}
