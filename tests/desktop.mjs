@@ -9,8 +9,9 @@ import mammoth from 'mammoth';
 const dir = await mkdtemp(path.join(tmpdir(), 'playbook-desktop-test-'));
 const extraArgs = [...(process.platform === 'linux' ? ['--no-sandbox', '--disable-gpu'] : []), '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'];
 const app = await electron.launch({ args: [...extraArgs, `--user-data-dir=${dir}`, '.'], env: { ...process.env, XDG_CACHE_HOME: path.join(dir, 'cache') } });
+let page;
 try {
-  const page = await app.firstWindow();
+  page = await app.firstWindow();
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await expect(page.getByText('Seu primeiro processo começa aqui', { exact: true })).toBeVisible();
   assert.equal(await page.evaluate(() => Boolean(window.studio)), true, 'preload deve disponibilizar IPC');
@@ -24,6 +25,8 @@ try {
   await page.getByRole('button', { name: 'Gravar processo', exact: true }).click();
   await expect(page.getByRole('dialog', { name: 'Gravar uma demonstração' })).toBeVisible();
   await page.getByRole('button', { name: 'Iniciar gravação', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Gravar uma demonstração' })).toBeHidden({ timeout: 15000 });
+  await expect(page.getByRole('button', { name: /Encerrar ·/ })).toBeVisible();
   await page.evaluate(() => window.studio.captureNow());
   await page.evaluate(() => window.studio.stopCapture());
   await expect(page.getByRole('button', { name: 'Gravar processo', exact: true })).toBeEnabled();
@@ -86,6 +89,8 @@ try {
   await page.getByRole('button', { name: 'Gravar processo', exact: true }).click();
   await expect(page.getByRole('checkbox', { name: /Gravar narração/ })).toBeChecked();
   await page.getByRole('button', { name: 'Iniciar gravação', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Gravar uma demonstração' })).toBeHidden({ timeout: 15000 });
+  await expect(page.getByRole('button', { name: /Encerrar ·/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /Encerrar ·/ })).toBeVisible();
   await page.waitForTimeout(1000); // Gera amostras com o microfone sintético do Chromium.
   await page.evaluate(() => window.studio.stopCapture());
@@ -110,6 +115,10 @@ try {
   assert.equal((await page.evaluate(() => window.studio.settings())).configured,false);
   assert.deepEqual(errors, []); assert.deepEqual(external, []);
   console.log(JSON.stringify({ status: 'passed', checks: ['preload e IPC', 'edição e persistência reais', 'captura e destaque', 'PDF com texto', 'Word com imagem', 'importação TXT/PDF/DOCX', 'microfone sintético e AudioWorklet WAV', 'recuperação após falha da API simulada', 'protocolo OpenAI simulado sem cobrança', 'chave não exposta no IPC', 'nenhuma requisição externa do renderer'], artifacts: dir }, null, 2));
+} catch(error) {
+  console.error('DESKTOP_FAILURE:', String(error.message).replace(/data:image\/[^\s"']+/g,'[image]').slice(0,1800));
+  console.error('VISIBLE_ALERTS:', await page?.getByRole('alert').allTextContents().catch(() => []));
+  process.exitCode = 1;
 } finally {
   await app.evaluate(({ app }) => app.exit(0)).catch(() => {});
 }

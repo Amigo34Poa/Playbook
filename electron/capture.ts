@@ -19,7 +19,7 @@ export class CaptureSession {
     if (this.active || this.finishing) throw new Error('Uma gravação já está em andamento.');
     const sources = await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 0, height: 0 } });
     const source = id === 'all' ? sources[0] : sources.find(s => s.id === id);
-    const display = screen.getAllDisplays().find(d => String(d.id) === source?.display_id);
+    const display = id === 'all' ? screen.getPrimaryDisplay() : screen.getAllDisplays().find(d => String(d.id) === source?.display_id);
     if (!source || !display) throw new Error('Monitor indisponível. Selecione a tela novamente.');
     this.displayId = source.display_id; this.sourceId = source.id; this.count = 0;
     this.active = true; this.window.minimize();
