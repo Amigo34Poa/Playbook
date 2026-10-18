@@ -4,11 +4,13 @@ Aplicativo desktop em português para transformar demonstrações de processos c
 
 ![Interface do Playbook Studio](docs/playbook-studio.png)
 
-## Pacote portátil gerado
+## Baixar para Windows
 
-A primeira compilação está em `release/Playbook-Studio-0.1.0-Windows-x64.zip`, com um executável portátil, o guia `PRIMEIRO-USO.txt` e o SHA-256 do executável. Extraia e execute o arquivo com final `Portatil.exe`; não é necessário instalar Node.js. O pacote foi gerado e sua estrutura foi conferida neste ambiente, mas ainda não foi executado no Windows.
+[Baixar o instalador de avaliação v0.1.1 para Windows x64](https://github.com/Amigo34Poa/Playbook/releases/download/v0.1.1/Playbook-Studio-0.1.1-Windows-x64.exe).
 
-No aplicativo portátil, **Configurações → Guia e preparação da IA** abre a pasta que contém `LEIA-ME.md` e `Preparar-IA.ps1`. Execute esse script diretamente da pasta aberta, com o aplicativo ainda em execução, ou copie-o para outra pasta antes de executar. Os modelos ficam fora da extração temporária do aplicativo, em `%LOCALAPPDATA%\PlaybookStudio\IA`. A biblioteca continua na pasta de dados do usuário.
+Consulte o [guia de primeiro uso](docs/PRIMEIRO-USO.md) e os demais arquivos na [página da versão](https://github.com/Amigo34Poa/Playbook/releases/tag/v0.1.1). O instalador foi gerado pelo GitHub Actions; seu download foi verificado com o SHA-256 publicado. Não é necessário instalar Node.js para usar o programa.
+
+Em **Configurações → Guia e preparação da IA**, abra a pasta com `LEIA-ME.md` e `Preparar-IA.ps1`. Os motores e modelos precisam de uma preparação separada e ficam por padrão em `%LOCALAPPDATA%\PlaybookStudio\IA`. A biblioteca fica na pasta de dados do usuário.
 
 ## O que esta versão faz
 
@@ -38,7 +40,7 @@ Para gerar o instalador:
 npm run dist:win
 ```
 
-O resultado fica em `release/Playbook-Studio-0.1.0-Windows-x64.exe`. O instalador NSIS permite escolher a pasta e criar atalho. Nesta versão o instalador não tem certificado de assinatura da empresa. O fluxo em `.github/workflows/windows.yml` também foi preparado para gerar o artefato em um runner Windows; ele só será executado depois que os arquivos forem enviados ao GitHub.
+O resultado fica em `release/Playbook-Studio-0.1.1-Windows-x64.exe`. O instalador NSIS permite escolher a pasta e criar atalho. Nesta versão o instalador não tem certificado de assinatura da empresa. O fluxo em `.github/workflows/windows.yml` gera o artefato em um runner Windows e publica uma versão de avaliação quando uma tag `v*`, correspondente à versão do aplicativo, passa pelas verificações. O empacotamento usa `--publish never`; a publicação acontece somente no job dedicado, depois dos testes.
 
 Para gerar uma distribuição portátil, use `npm run dist:portable`. A geração do instalador NSIS neste Linux ficou bloqueada pela ausência de Wine; a distribuição portátil foi gerada com sucesso. O comando de instalador permanece preparado para execução no Windows.
 
@@ -115,6 +117,6 @@ npm run test:desktop
 
 `test:desktop` precisa de uma sessão gráfica e de um monitor disponível; usa perfil temporário próprio. Os testes exercitam IPC com isolamento, persistência real, captura nativa e destaque, PDF, Word com imagem, importação dos três formatos e recuperação de áudio após falha. Não medem qualidade de reconhecimento de voz ou de redação.
 
-Validado nesta implementação em Linux com monitor virtual: build TypeScript/Vite, testes de domínio e interface, fluxo desktop nativo e exportações/importações reais. **A inferência com os modelos reais, o script PowerShell, o instalador e a captura/microfone em Windows 10 e 11 ainda exigem validação nas máquinas de destino.** O ambiente de desenvolvimento bloqueou o acesso ao Hugging Face, portanto os modelos não foram baixados nem a qualidade da IA foi avaliada aqui.
+Validados em Linux com monitor virtual e no runner Windows do GitHub Actions: build TypeScript/Vite, seis testes de domínio, três testes de interface e fluxo desktop nativo, incluindo exportações/importações reais e microfone simulado. A [execução da versão v0.1.1](https://github.com/Amigo34Poa/Playbook/actions/runs/39094491030) concluiu com sucesso e publicou o instalador. **A inferência com modelos reais, o script de preparação da IA e o uso do aplicativo instalado com microfone real no Windows 10/11 e no TBS da empresa ainda exigem validação nas máquinas de destino.** O ambiente de desenvolvimento bloqueou o acesso ao Hugging Face, portanto os modelos não foram baixados nem a qualidade da IA foi avaliada aqui.
 
 Antes de uso pela equipe, execute em cada versão do Windows uma demonstração curta no TBS real, incluindo monitor com escala de 125%/150%, múltiplos monitores quando usados pela empresa, microfone, associação de imagens, exportação e reabertura dos arquivos. Repita com a internet desconectada após instalar os modelos. A compatibilidade foi projetada para Windows 10/11 x64; não há evidência para prometer funcionamento perfeito nessas máquinas sem essa validação.
