@@ -8,7 +8,8 @@ import mammoth from 'mammoth';
 
 const dir = await mkdtemp(path.join(tmpdir(), 'playbook-desktop-test-'));
 const extraArgs = [...(process.platform === 'linux' ? ['--no-sandbox', '--disable-gpu'] : []), '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'];
-const app = await electron.launch({ args: [...extraArgs, `--user-data-dir=${dir}`, '.'], env: { ...process.env, XDG_CACHE_HOME: path.join(dir, 'cache') } });
+const packaged = process.env.PLAYBOOK_EXECUTABLE;
+const app = await electron.launch({ ...(packaged ? {executablePath:path.resolve(packaged)} : {}), args: [...extraArgs, `--user-data-dir=${dir}`, ...(packaged ? [] : ['.'])], env: { ...process.env, XDG_CACHE_HOME: path.join(dir, 'cache') } });
 let page;
 try {
   page = await app.firstWindow();

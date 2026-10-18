@@ -50,6 +50,18 @@ jobs:
             exit 1
           }
       - run: npm run dist:win
+      - name: Validar pacote Windows com recursos nativos
+        shell: pwsh
+        env:
+          PLAYBOOK_EXECUTABLE: release/win-unpacked/Playbook Studio.exe
+        run: |
+          if (!(Test-Path 'release/win-unpacked/resources/native/ClickRecorder.exe')) { throw 'Observador de cliques ausente no pacote.' }
+          npm run test:desktop 2>&1 | Tee-Object packaged-test.log
+          if ($LASTEXITCODE -ne 0) {
+            $tail = ((Get-Content packaged-test.log -Tail 65) -join "%0A")
+            Write-Output "::error title=Teste pacote Windows::$tail"
+            exit 1
+          }
       - name: Conferir versão da publicação
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
