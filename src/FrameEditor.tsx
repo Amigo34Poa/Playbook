@@ -14,10 +14,18 @@ export function FrameEditor({ frame, disabled, save, error }: { frame: Frame; di
   }
   const locked = disabled || working || !frame.originalImage;
   return <>
-    <div style={{ position: 'relative', touchAction: adjust ? 'none' : 'auto' }}
+    <div style={{ position: 'relative', width: `min(100%, ${55*frame.width/frame.height}vh)`, margin: '0 auto', touchAction: adjust ? 'none' : 'auto' }}
       onPointerDown={e => { if (!adjust || locked) return; const r=e.currentTarget.getBoundingClientRect(); const p={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}; start.current=p; e.currentTarget.setPointerCapture(e.pointerId); }}
       onPointerMove={e => { if (!start.current) return; const r=e.currentTarget.getBoundingClientRect(); const x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height)); setRegion({x:Math.min(x,start.current.x),y:Math.min(y,start.current.y),width:Math.abs(x-start.current.x),height:Math.abs(y-start.current.y)}); }}
-      onPointerUp={() => { if (!start.current) return; start.current=undefined; if(region && region.width>.003 && region.height>.003) void mark(frame.annotation?.style ?? 'highlight', undefined, region, true); setRegion(undefined); setAdjust(false); }}
+      onPointerUp={e => {
+        const from=start.current; if (!from) return;
+        const r=e.currentTarget.getBoundingClientRect();
+        const x=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)), y=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
+        const target={ x:Math.min(x,from.x), y:Math.min(y,from.y), width:Math.abs(x-from.x), height:Math.abs(y-from.y) };
+        start.current=undefined;
+        if(target.width>.003 && target.height>.003) void mark(frame.annotation?.style ?? 'highlight', undefined, target, true);
+        setRegion(undefined); setAdjust(false);
+      }}
       onPointerCancel={() => { start.current=undefined; setRegion(undefined); }}>
       <img className="large-frame" style={{ display:'block', maxHeight:'none', cursor:adjust?'crosshair':'default' }} draggable={false} src={frame.image} alt="Captura com destaque da ação" />
       {region && <div style={{ position:'absolute', pointerEvents:'none', border:'2px dashed #e68a00', background:'#ffcb4533', left:`${region.x*100}%`,top:`${region.y*100}%`,width:`${region.width*100}%`,height:`${region.height*100}%` }} />}

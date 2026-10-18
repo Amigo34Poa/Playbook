@@ -37,6 +37,7 @@ try {
   const imageDialog = page.getByRole('dialog', { name: /Captura ·/ });
   await imageDialog.getByRole('button', {name:'Circular',exact:true}).click();
   await imageDialog.getByRole('button', {name:'Ajustar região',exact:true}).click();
+  await imageDialog.getByAltText('Captura com destaque da ação', {exact:true}).scrollIntoViewIfNeeded();
   const bounds = await imageDialog.getByAltText('Captura com destaque da ação', {exact:true}).boundingBox();
   await page.mouse.move(bounds.x+bounds.width*.2,bounds.y+bounds.height*.2); await page.mouse.down();
   await page.mouse.move(bounds.x+bounds.width*.4,bounds.y+bounds.height*.4,{steps:5}); await page.mouse.up();
