@@ -9,7 +9,7 @@ if (!existsSync(csc)) throw new Error('Compilador .NET Framework 4.x não encont
 mkdirSync('native/windows/build', { recursive: true });
 const references = ['System.dll','System.Core.dll','System.Drawing.dll','System.Windows.Forms.dll','System.Web.Extensions.dll',...['UIAutomationClient.dll','UIAutomationTypes.dll','WindowsBase.dll'].map(f => path.join(framework,'WPF',f))];
 function compile(source, name) {
-  const result=spawnSync(csc,['/nologo','/target:exe','/platform:x64','/optimize+',`/out:native/windows/build/${name}.exe`,...references.map(r=>`/reference:${r}`),source],{stdio:'inherit'});
+  const result=spawnSync(csc,['/nologo','/target:exe','/platform:x64','/optimize+',`/out:${path.resolve('native/windows/build',`${name}.exe`)}`,...references.map(r=>`/reference:${r}`),path.resolve(source)],{stdio:'inherit'});
   if(result.error) throw result.error;
   if(result.status!==0)process.exit(result.status ?? 1);
 }
