@@ -4,7 +4,13 @@ export interface Step {
   description: string;
   frameId?: string;
 }
+export type MarkStyle = 'smart' | 'highlight' | 'circle' | 'underline';
 export interface Frame {
+  originalImage?: string;
+  manuallyAdjusted?: boolean;
+  target?: { x: number; y: number; width: number; height: number };
+  action?: { reason: 'click' | 'manual'; button: 'left' | 'right' | 'none'; controlName: string; controlType: string; detection: 'uia' | 'point' };
+  annotation?: { style: MarkStyle; color: string };
   id: string;
   at: number;
   image: string;
@@ -28,8 +34,8 @@ export interface Procedure {
   review: string;
 }
 export interface Workspace { company: string; procedures: Procedure[] }
-export interface EngineConfig { whisperExecutable: string; whisperModel: string; llamaExecutable: string; llamaModel: string; threads: number }
-export interface Settings extends EngineConfig { configured: boolean; running: boolean }
+export interface OnlineConfig { textModel: string; markStyle: MarkStyle; markColor: string; apiKey?: string; removeKey?: boolean }
+export interface Settings { configured: boolean; textModel: string; markStyle: MarkStyle; markColor: string }
 export interface DisplaySource { id: string; name: string; thumbnail: string }
 export interface CaptureStatus { active: boolean; count: number; message?: string }
 export interface ExportDocument { title: string; role: string; category: string; objective: string; steps: Step[]; frames: Frame[] }
@@ -37,8 +43,7 @@ export interface StudioAPI {
   load(): Promise<Workspace>;
   save(workspace: Workspace): Promise<void>;
   settings(): Promise<Settings>;
-  configure(config: EngineConfig): Promise<Settings>;
-  chooseEngineFile(kind: 'executable' | 'whisper' | 'llama'): Promise<string | null>;
+  configure(config: OnlineConfig): Promise<Settings>;
   openFolder(kind: 'resources' | 'data'): Promise<void>;
   testConnection(): Promise<void>;
   displays(): Promise<DisplaySource[]>;

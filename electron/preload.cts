@@ -1,12 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import type { CaptureStatus, Frame, Procedure, StudioAPI, Workspace, ExportDocument, EngineConfig } from '../shared/types.js';
+import type { CaptureStatus, Frame, Procedure, StudioAPI, Workspace, ExportDocument, OnlineConfig } from '../shared/types.js';
 
 const api: StudioAPI = {
   load: () => ipcRenderer.invoke('workspace:load'),
   save: (workspace: Workspace) => ipcRenderer.invoke('workspace:save', workspace),
   settings: () => ipcRenderer.invoke('settings:get'),
-  configure: (config: EngineConfig) => ipcRenderer.invoke('settings:configure', config),
-  chooseEngineFile: (kind) => ipcRenderer.invoke('settings:choose-file', kind),
+  configure: (config: OnlineConfig) => ipcRenderer.invoke('settings:configure', config),
   openFolder: kind => ipcRenderer.invoke('settings:open-folder', kind),
   testConnection: () => ipcRenderer.invoke('ai:test'),
   displays: () => ipcRenderer.invoke('capture:displays'),

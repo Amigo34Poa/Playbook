@@ -7,7 +7,6 @@ import { configure, getSettings, loadWorkspace, saveWorkspace } from './storage.
 import { generate, review, testConnection, transcribe } from './ai.js';
 import { exportDocument, importReferences } from './documents.js';
 import { frameSchema, procedureSchema, stepSchema } from '../shared/schema.js';
-import { engineRunning, stopEngine } from './local-engine.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 let window: BrowserWindow;
@@ -37,26 +36,20 @@ app.whenReady().then(async () => {
     if (closing) return;
     event.preventDefault();
     void dialog.showMessageBox(window, { type: 'question', title: 'Fechar Playbook Studio', message: 'Deseja fechar o aplicativo?', detail: 'Se houver uma gravação ou processamento em andamento, conclua e aguarde a indicação “Salvo neste computador” antes de sair.', buttons: ['Continuar trabalhando', 'Fechar'], defaultId: 0, cancelId: 0 }).then(result => {
-      if (result.response === 1) { closing = true; capture.stop(); window.close(); }
+      if (result.response === 1) { closing = true; void capture.stop().finally(() => window.close()); }
     });
   });
   register('workspace:load', loadWorkspace);
   register('workspace:save', saveWorkspace);
-  register('settings:get', async () => ({ ...await getSettings(), running: engineRunning() }));
-  register('settings:configure', config => { stopEngine(); return configure(config); });
-  register('settings:choose-file', async kind => {
-    z.enum(['executable', 'whisper', 'llama']).parse(kind);
-    const extensions = kind === 'executable' ? (process.platform === 'win32' ? ['exe'] : ['*']) : kind === 'whisper' ? ['bin'] : ['gguf'];
-    const result = await dialog.showOpenDialog(window, { title: 'Selecionar arquivo da IA local', properties: ['openFile'], filters: [{ name: 'Arquivo da IA', extensions }] });
-    return result.canceled ? null : result.filePaths[0];
-  });
+  register('settings:get', getSettings);
+  register('settings:configure', configure);
   register('settings:open-folder', async kind => {
     z.enum(['resources', 'data']).parse(kind);
     const target = kind === 'data' ? app.getPath('userData') : app.isPackaged ? process.resourcesPath : app.getAppPath();
     const error = await shell.openPath(target); if (error) throw new Error('Não foi possível abrir a pasta no explorador de arquivos.');
   });
   register('ai:test', testConnection);
-  register('capture:displays', async () => (await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 420, height: 260 } })).map(s => ({ id: s.id, name: s.name, thumbnail: s.thumbnail.toDataURL() })));
+  register('capture:displays', async () => { const screens = (await desktopCapturer.getSources({ types: ['screen'], thumbnailSize: { width: 420, height: 260 } })).map(s => ({ id: s.id, name: s.name, thumbnail: s.thumbnail.toDataURL() })); return process.platform === 'win32' && screens.length ? [{ id: 'all', name: 'Todos os monitores · acompanhar cliques', thumbnail: screens[0].thumbnail }, ...screens] : screens; });
   register('capture:start', id => capture.start(z.string().parse(id)));
   register('capture:now', () => capture.capture());
   register('capture:stop', () => capture.stop());
@@ -72,4 +65,4 @@ app.whenReady().then(async () => {
   else await window.loadFile(path.join(here, '../../dist/index.html'));
 });
 app.on('window-all-closed', () => app.quit());
-app.on('will-quit', () => { capture?.stop(); stopEngine(); });
+app.on('will-quit', () => { void capture?.stop(); });

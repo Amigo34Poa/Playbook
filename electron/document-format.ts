@@ -10,7 +10,7 @@ export function printHtml(document: ExportDocument): string {
   ${document.objective ? `<h2>Objetivo</h2><p>${e(document.objective)}</p>` : ''}
   ${document.steps.map((s, i) => {
     const frame = document.frames.find(f => f.id === s.frameId);
-    return `<section class="step"><h2>${i + 1}. ${e(s.title)}</h2><p>${e(s.description)}</p>${frame ? `<div class="figure"><img src="${frame.image}" alt="Captura da etapa ${i + 1}"><div class="caption">Etapa ${i + 1} · Região indicada pelo cursor durante a demonstração</div></div>` : ''}</section>`;
+    return `<section class="step"><h2>${i + 1}. ${e(s.title)}</h2><p>${e(s.description)}</p>${frame ? `<div class="figure"><img src="${frame.image}" alt="Captura da etapa ${i + 1}"><div class="caption">Etapa ${i + 1} · Destaque da ação durante a demonstração</div></div>` : ''}</section>`;
   }).join('')}
   </body></html>`;
 }
@@ -29,7 +29,7 @@ export async function buildDocx(document: ExportDocument): Promise<Buffer> {
       const height = Math.min(680, width * frame.height / frame.width);
       const scaledWidth = height * frame.width / frame.height;
       children.push(new Paragraph({ children: [new ImageRun({ type: frame.image.startsWith('data:image/png') ? 'png' : 'jpg', data: Buffer.from(frame.image.split(',')[1], 'base64'), transformation: { width: scaledWidth, height }, altText: { title: step.title, description: `Captura da etapa ${index + 1}`, name: 'Captura de tela' } })] }));
-      children.push(new Paragraph({ text: `Etapa ${index + 1} · Região indicada pelo cursor`, spacing: { after: 300 } }));
+      children.push(new Paragraph({ text: `Etapa ${index + 1} · Destaque da ação`, spacing: { after: 300 } }));
     }
   }
   return Packer.toBuffer(new Document({ creator: 'Playbook Studio', title: document.title, sections: [{ properties: { page: { margin: { top: 1000, right: 1000, bottom: 1000, left: 1000 } } }, children }] }));

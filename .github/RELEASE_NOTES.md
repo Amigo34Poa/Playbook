@@ -1,7 +1,7 @@
-Primeira versão de avaliação do Playbook Studio para Windows 10 e 11 x64.
+O Playbook Studio 0.2 registra cliques no Windows como etapas com prints, identifica controles via UI Automation e permite grifar, circular, sublinhar ou ajustar manualmente a região destacada.
 
-Baixe o arquivo `.exe` em **Assets** e consulte `PRIMEIRO-USO.md`. A instalação dos motores e modelos locais de IA é uma preparação separada; os modelos não estão incluídos no instalador.
+A IA passa a ser exclusivamente online com sua chave OpenAI, configurada e protegida no aplicativo. Transcrição envia áudio; organização e comparação enviam textos. As imagens permanecem locais. A API cobra por uso. Modelos offline não são necessários; a biblioteca existente é preservada.
 
-Recursos: biblioteca por cargo, gravação guiada com capturas da região do cursor, narração em WAV, integração offline com whisper.cpp e llama.cpp, documentos de referência e exportação de cada procedimento em PDF ou Word com imagens.
+Baixe o instalador Windows x64 abaixo e consulte PRIMEIRO-USO.md. Compare o SHA-256 com SHA256SUMS.txt. Versão de avaliação sem assinatura digital de editor. A identificação de controles depende do que o TBS expõe ao Windows e precisa ser conferida no seu computador.
 
-O fluxo de publicação exige build e testes no runner Windows, incluindo captura nativa e microfone simulado. Isso não substitui a validação de microfone real, modelos de IA e procedimentos no TBS da empresa. A qualidade da transcrição e da redação com modelos reais ainda precisa ser avaliada. O instalador não tem assinatura digital da empresa.
+Validação automatizada: compilação Windows, cliques reais em aplicativo de teste com UI Automation e imagem anterior ao clique, edição, captura, importação, PDF/Word e integração OpenAI simulada. Não houve teste com conta OpenAI real nem com o TBS da empresa.

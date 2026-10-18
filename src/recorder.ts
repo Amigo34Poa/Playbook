@@ -51,14 +51,18 @@ export class VoiceRecorder {
   }
 }
 
-export async function annotateFrame<T extends { image: string; width: number; height: number; cursor: { x: number; y: number } }>(frame: T): Promise<T> {
-  const image = new Image(); image.src = frame.image; await image.decode();
+export async function annotateFrame(frame: import('../shared/types').Frame, style: import('../shared/types').MarkStyle = 'smart', color = '#f59e0b'): Promise<import('../shared/types').Frame> {
+  const originalImage = frame.originalImage ?? frame.image;
+  const image = new Image(); image.src = originalImage; await image.decode();
   const canvas = document.createElement('canvas'); canvas.width = frame.width; canvas.height = frame.height;
-  const ctx = canvas.getContext('2d')!; ctx.drawImage(image, 0, 0);
-  const x = frame.cursor.x * frame.width, y = frame.cursor.y * frame.height;
-  const boxWidth = Math.min(150, frame.width), boxHeight = Math.min(62, frame.height);
-  ctx.fillStyle = 'rgba(37,178,126,0.15)'; ctx.strokeStyle = '#0ab77f'; ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.roundRect(Math.max(2, Math.min(frame.width - boxWidth - 2, x - boxWidth / 2)), Math.max(2, Math.min(frame.height - boxHeight - 2, y - boxHeight / 2)), boxWidth, boxHeight, 8); ctx.fill(); ctx.stroke();
-  ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.stroke();
-  return { ...frame, image: canvas.toDataURL('image/jpeg', 0.88) };
+  const ctx = canvas.getContext('2d')!; ctx.drawImage(image, 0, 0, frame.width, frame.height);
+  const r = frame.target ?? { x: Math.max(0, Math.min(.9, frame.cursor.x - .045)), y: Math.max(0, Math.min(.95, frame.cursor.y - .025)), width: .09, height: .05 };
+  const x = Math.max(2, r.x * frame.width), y = Math.max(2, r.y * frame.height);
+  const w = Math.max(4, Math.min(r.width * frame.width, frame.width - x - 2)), h = Math.max(4, Math.min(r.height * frame.height, frame.height - y - 2));
+  const mark = style === 'smart' ? (/Button|MenuItem|Hyperlink|TabItem/.test(frame.action?.controlType ?? '') ? 'underline' : /Edit|ComboBox/.test(frame.action?.controlType ?? '') ? 'highlight' : 'circle') : style;
+  ctx.strokeStyle = color; ctx.fillStyle = color + '45'; ctx.lineWidth = Math.max(3, frame.width / 400); ctx.lineCap = 'round';
+  if (mark === 'underline') { ctx.beginPath(); ctx.moveTo(x, Math.min(frame.height - 2, y + h)); ctx.lineTo(x + w, Math.min(frame.height - 2, y + h)); ctx.stroke(); }
+  else if (mark === 'circle') { ctx.beginPath(); ctx.ellipse(x + w/2, y + h/2, w/2, h/2, 0, 0, Math.PI*2); ctx.stroke(); }
+  else { ctx.fillRect(x,y,w,h); ctx.strokeRect(x,y,w,h); }
+  return { ...frame, originalImage, annotation: { style, color }, image: canvas.toDataURL('image/jpeg', .88) };
 }

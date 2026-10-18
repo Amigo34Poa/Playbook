@@ -1,8 +1,13 @@
 import { z } from 'zod';
 
+export const rectSchema = z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1), width: z.number().positive().max(1), height: z.number().positive().max(1) }).refine(r => r.x + r.width <= 1.002 && r.y + r.height <= 1.002);
+export const markStyleSchema = z.enum(['smart', 'highlight', 'circle', 'underline']);
+export const imageSchema = z.string().max(6_000_000).regex(/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/);
 export const frameSchema = z.object({
   id: z.string().uuid(), at: z.number().nonnegative(),
-  image: z.string().max(6_000_000).regex(/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/),
+  manuallyAdjusted: z.boolean().optional(), image: imageSchema, originalImage: imageSchema.optional(), target: rectSchema.optional(),
+  annotation: z.object({ style: markStyleSchema, color: z.string().regex(/^#[0-9a-fA-F]{6}$/) }).optional(),
+  action: z.object({ reason: z.enum(['click','manual']), button: z.enum(['left','right','none']), controlName: z.string().max(300), controlType: z.string().max(100), detection: z.enum(['uia','point']) }).optional(),
   cursor: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) }),
   width: z.number().int().positive().max(16384), height: z.number().int().positive().max(16384),
 });
