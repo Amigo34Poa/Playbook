@@ -1,6 +1,6 @@
 {
   "name": "playbook-studio",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Crie processos comerciais a partir da sua voz e de capturas de tela.",
   "author": "Playbook Studio",
@@ -11,11 +11,11 @@
     "build:electron": "tsc -p tsconfig.electron.json",
     "build": "tsc --noEmit && vite build && npm run build:electron",
     "test": "tsx --test tests/*.test.ts",
-    "dist:win": "npm run build && electron-builder --win nsis --x64",
+    "dist:win": "npm run build && electron-builder --win nsis --x64 --publish never",
     "start": "electron .",
     "test:ui": "playwright test",
     "test:desktop": "node tests/desktop.mjs",
-    "dist:portable": "npm run build && electron-builder --win portable --x64"
+    "dist:portable": "npm run build && electron-builder --win portable --x64 --publish never"
   },
   "dependencies": {
     "docx": "^9.5.1",

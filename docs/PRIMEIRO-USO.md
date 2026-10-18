@@ -1,7 +1,7 @@
 # Primeiro uso — Playbook Studio
 
 1. Entre na sua conta do GitHub e abra a versão publicada em **Releases** do repositório `Amigo34Poa/Playbook`.
-2. Em **Assets**, baixe o arquivo `Playbook-Studio-0.1.0-Windows-x64.exe` e execute-o no Windows 10 ou 11 de 64 bits. Não é necessário instalar Node.js. Esta é uma versão de avaliação sem assinatura digital da empresa.
+2. Em **Assets**, baixe o arquivo do instalador com final `Windows-x64.exe` e execute-o no Windows 10 ou 11 de 64 bits. Não é necessário instalar Node.js. Esta é uma versão de avaliação sem assinatura digital da empresa.
 3. A edição de texto e a captura de tela podem ser usadas sem IA. Para transcrever a voz e organizar o texto automaticamente, prepare os motores e modelos locais.
 4. Abra **Configurações → Guia e preparação da IA**. A pasta aberta contém `LEIA-ME.md` e `Preparar-IA.ps1`. O script também está disponível nos arquivos desta versão do GitHub.
 5. Execute `Preparar-IA.ps1` no PowerShell, em um computador conectado à internet. Ele baixa os motores e modelos oficiais e verifica seus hashes. Se a política da empresa bloquear scripts, siga a preparação manual no guia ou solicite apoio de TI. Os arquivos também podem ser preparados em outra máquina e transferidos para um computador sem internet.
