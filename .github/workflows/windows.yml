@@ -40,7 +40,15 @@ jobs:
       - run: npm run build
       - run: npx playwright install chromium
       - run: npm run test:ui
-      - run: npm run test:desktop
+      - name: Validar aplicativo desktop
+        shell: pwsh
+        run: |
+          npm run test:desktop 2>&1 | Tee-Object desktop-test.log
+          if ($LASTEXITCODE -ne 0) {
+            $tail = ((Get-Content desktop-test.log -Tail 65) -join "%0A")
+            Write-Output "::error title=Teste desktop::$tail"
+            exit 1
+          }
       - run: npm run dist:win
       - name: Conferir versão da publicação
         if: startsWith(github.ref, 'refs/tags/v')
